@@ -66,12 +66,12 @@ const styles = StyleSheet.create({
   },
   gameNameText: {
     color: '#ffffff',
-    fontSize: RFValue(10),
+    fontSize: RFValue(16),
     fontWeight: 'bold',
     textAlign: 'center',
   },
   iconText: {
-    fontSize: RFValue(16),
+    fontSize: RFValue(28),
     textAlign: 'center',
   },
   containerPressed: {
