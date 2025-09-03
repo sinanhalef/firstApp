@@ -5,31 +5,55 @@ import { RFValue } from 'react-native-responsive-fontsize';
 
 const SpyGame = () => {
   const [playerCount, setPlayerCount] = useState(3);
+  const [spyCount, setSpyCount] = useState(1);
   const [word, setWord] = useState('');
   const [currentPlayer, setCurrentPlayer] = useState(1);
-  const [showWord, setShowWord] = useState(true);
+  const [showWord, setShowWord] = useState(false);
   const [started, setStarted] = useState(false);
+  const [rememberWord, setRememberWord] = useState('');
+  const [spies, setSpies] = useState([0,1,2]);
 
   const handleTap = () => {
     if (!started) return;
-    if (showWord) {
-      setShowWord(false);
+    if (!showWord) {
+      setShowWord(true);
     } else {
       if (currentPlayer < playerCount) {
         setCurrentPlayer(currentPlayer + 1);
-        setShowWord(true);
+        if (spies.includes(currentPlayer)) {
+            setWord("You are a spy!!");
+        } else {
+            setWord(rememberWord);
+        }
+        setShowWord(false);
       } else {
         setCurrentPlayer(1);
-        setShowWord(true);
+        setShowWord(false);
         setStarted(false);
       }
     }
+  };
+
+  const selectRandomSpies = () => {
+    setRememberWord(word);
+    const allPlayers = Array.from({ length: playerCount }, (_, i) => i);
+    const shuffled = allPlayers.sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, spyCount);
+    console.log("Selected spies:", selected);
+    setSpies(selected);
   };
 
   return (
     <View style={styles.container}>
       {!started ? (
         <>
+        <Text style={styles.label}>Type in a word:</Text>
+          <TextInput
+            style={styles.input}
+            value={word}
+            onChangeText={setWord}
+            placeholder="Enter word"
+          />
           <Text style={styles.label}>Select number of players:</Text>
           <Picker
             selectedValue={playerCount}
@@ -40,16 +64,20 @@ const SpyGame = () => {
               <Picker.Item key={i+3} label={`${i+3}`} value={i+3} />
             ))}
           </Picker>
-          <Text style={styles.label}>Type in a word:</Text>
-          <TextInput
-            style={styles.input}
-            value={word}
-            onChangeText={setWord}
-            placeholder="Enter word"
-          />
+          <Text style={styles.label}>Select number of spies:</Text>
+          <Picker
+            selectedValue={spyCount}
+            style={styles.picker}
+            onValueChange={setSpyCount}
+          >
+            {[...Array(3)].map((_, i) => (
+              <Picker.Item key={i+1} label={`${i+1}`} value={i+1} />
+            ))}
+          </Picker>
+        
           <TouchableOpacity
             style={styles.startButton}
-            onPress={() => setStarted(true)}
+            onPress={() =>  {setStarted(true); selectRandomSpies();}}
             disabled={!word}
           >
             <Text style={styles.startButtonText}>Start Game</Text>
@@ -80,7 +108,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   picker: {
-    width: RFValue(120),
+    width: RFValue(80),
     marginBottom: 16,
   },
   input: {
