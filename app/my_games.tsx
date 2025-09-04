@@ -10,7 +10,7 @@ export default function RootLayout() {
     <View style={styles.container}>
       <Text style={styles.welcomeText}>Welcome</Text>
       <View style={styles.iconsContainer}>
-        <GameIcon gameName="Spy" iconName="🎮" gameRoute={"/spy" as Href}/>
+        <GameIcon gameName="Spy" iconName="🎮" gameRoute={"/spy_game_select" as Href}/>
         <GameIcon iconName="🎯"/>
       
       </View>

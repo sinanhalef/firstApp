@@ -1,12 +1,15 @@
+import Icon from '@expo/vector-icons/Ionicons';
 import { Picker } from '@react-native-picker/picker';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import Icon from '@expo/vector-icons/Ionicons';
+import themeSpyColors from '../constants/themeSpyColors';
 
 const SpyGame = () => {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const selectedSet = typeof params.wordSet === 'string' ? params.wordSet : null;
   const [playerCount, setPlayerCount] = useState(3);
   const [spyCount, setSpyCount] = useState(1);
   const [word, setWord] = useState('');
@@ -16,6 +19,18 @@ const SpyGame = () => {
   const [rememberWord, setRememberWord] = useState('');
   const [spies, setSpies] = useState([0,1,2]);
   const [spyStyle, setSpyStyle] = useState(false);
+  const [randomizedSetWords, setRandomizedSetWords] = useState<string[]>([]);
+  const [wordIndex, setWordIndex] = useState(0);
+
+  const sets: Record<string, () => Promise<{ default: { words: string[] }; words: string[] }>> = {
+    places: () => import("../wordSets/places.json"),
+    famous_people_us: () => import("../wordSets/famous_people_us.json"),
+    famous_people_tr: () => import("../wordSets/famous_people_tr.json"),
+    football_players_tr: () => import("../wordSets/football_players_tr.json"),
+    football_players_world: () => import("../wordSets/football_players_world.json"),
+    films_world: () => import("../wordSets/films_world.json"),
+  };
+
 
   const handleTap = () => {
     if (!started) return;
@@ -45,30 +60,60 @@ const SpyGame = () => {
     const shuffled = allPlayers.sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, spyCount);
     setSpies(selected);
-    console.log(selected);
   };
-  
-  const selectRandomWord = () => {
-    const places = require('../wordSets/places.json').places;
-    const randomIndex = Math.floor(Math.random() * places.length);
-    setRememberWord(places[randomIndex]);
-    return places[randomIndex];
+
+  function shuffleArray(array: string[]): string[] {
+    return array
+      .map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
   }
 
+  const selectRandomWord = async () => {
+    let words: string[] = [];
+    if (selectedSet) {
+      const setLoader = sets[selectedSet];
+      if (!setLoader) return '';
+      const setData = await setLoader();
+      words = setData.words || setData.default?.words || [];
+    } else {
+      if (Array.isArray(params.wordsCustom)) {
+        words = params.wordsCustom as string[];
+      } else if (typeof params.wordsCustom === 'string') {
+        try {
+          words = JSON.parse(params.wordsCustom);
+          if (!Array.isArray(words)) {
+            words = params.wordsCustom.split(',').map(w => w.trim()).filter(Boolean);
+          }
+        } catch {
+          words = params.wordsCustom.split(',').map(w => w.trim()).filter(Boolean);
+        }
+      }
+    }
+
+    if (randomizedSetWords.length === 0 || randomizedSetWords.length !== words.length || wordIndex+1 === words.length) {
+      const shuffled = shuffleArray(words);
+      setRandomizedSetWords(shuffled);
+      setWordIndex(0);
+      setRememberWord(shuffled[0]);
+      return shuffled[0];
+    } else {
+      const nextIndex = (wordIndex + 1) % randomizedSetWords.length;
+      setWordIndex(nextIndex);
+      setRememberWord(randomizedSetWords[nextIndex]);
+      return randomizedSetWords[nextIndex];
+    }
+  }
+
+  
   return (
     <View style={styles.container}>
-        <TouchableOpacity style={styles.backIcon} onPress={() => router.push('/my_games')}>
+        <TouchableOpacity style={styles.backIcon} onPress={() => started ? router.push('/spy') : router.push('/spy_game_select')}>
           <Icon name="arrow-back" size={28} color="#fff" />
         </TouchableOpacity>
       {!started ? (
         <>
-        {/* <Text style={styles.label}>Type in a word:</Text> */}
-          {/* <TextInput
-            style={styles.input}
-            value={word}
-            onChangeText={() => {}}
-            placeholder="Enter word"
-          /> */}
+          
           <View style = {styles.pickerLabelContainer}>
 
           <View style={styles.labelsContainer}>
@@ -102,7 +147,7 @@ const SpyGame = () => {
         
           <TouchableOpacity
             style={styles.startButton}
-            onPress={() =>  {setStarted(true); selectRandomSpies(); setWord(selectRandomWord());}}
+            onPress={async () =>  {setStarted(true); selectRandomSpies(); setWord(await selectRandomWord());}}
           >
             <Text style={styles.startButtonText}>Start Game</Text>
           </TouchableOpacity>
@@ -123,48 +168,48 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 1)',
+    backgroundColor: themeSpyColors.background,
     padding: RFValue(16),
   },
   backIcon: {
     position: 'absolute',
-    top: 40,
-    left: 20,
+    top: RFValue(40),
+    left: RFValue(20),
     zIndex: 10,
   },
   label: {
     fontSize: RFValue(16),
-    marginBottom: 8,
+    marginBottom: RFValue(8),
     fontWeight: 'bold',
     textAlign: "center",
-      color: '#ffffff',
+    color: themeSpyColors.text,
   },
   picker: {
     width: RFValue(80),
     marginBottom: RFValue(16),
-    color: '#ffffff',
+    color: themeSpyColors.text,
     fontSize: RFValue(20),
   },
   input: {
     width: RFValue(180),
     height: RFValue(40),
-    borderColor: '#ccc',
+    borderColor: themeSpyColors.border,
     borderWidth: RFValue(1),
     borderRadius: RFValue(8),
     paddingHorizontal: RFValue(8),
     marginBottom: RFValue(16),
     fontSize: RFValue(16),
-    backgroundColor: '#f9f9f9',
+    backgroundColor: themeSpyColors.inputBackground,
   },
   startButton: {
-    backgroundColor: '#961a1aff',
+    backgroundColor: themeSpyColors.startButton,
     paddingVertical: RFValue(10),
     paddingHorizontal: RFValue(24),
     borderRadius: RFValue(8),
     marginTop: RFValue(8),
   },
   startButtonText: {
-    color: '#fff',
+    color: themeSpyColors.text,
     fontWeight: 'bold',
     fontSize: RFValue(16),
   },
@@ -178,24 +223,24 @@ const styles = StyleSheet.create({
     fontSize: RFValue(24),
     fontWeight: 'bold',
     marginBottom: RFValue(16),
-    color: '#ffffff',
+    color: themeSpyColors.text,
   },
   wordText: {
     fontSize: RFValue(32),
-    color: '#1fa4cd',
+    color: themeSpyColors.wordText,
     fontWeight: 'bold',
-    marginBottom: 24,
+    marginBottom: RFValue(24),
   },
   spyText: {
     fontSize: RFValue(32),
-    color: '#ff0000ff',
+    color: themeSpyColors.spyText,
     fontWeight: 'bold',
-    marginBottom: 24,
+    marginBottom: RFValue(24),
   },
   tapText: {
     fontSize: RFValue(14),
-    color: '#888',
-    marginTop: 32,
+    color: themeSpyColors.tapText,
+    marginTop: RFValue(32),
   },
   pickerContainer: {
     flexDirection: 'row',
