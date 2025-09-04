@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -15,11 +15,12 @@ const SpyCreateYourOwn = () => {
 	const [editText, setEditText] = useState('');
 	const [saveName, setSaveName] = useState('');
 	const [saving, setSaving] = useState(false);
+    const params = useLocalSearchParams();
 
 	React.useEffect(() => {
 		const loadWords = async () => {
 			try {
-				const path = FileSystem.documentDirectory + 'player_set.json';
+				const path = FileSystem.documentDirectory + params.wordSet;
 				const exists = await FileSystem.getInfoAsync(path);
 				if (exists.exists) {
 					const fileContent = await FileSystem.readAsStringAsync(path);
@@ -44,12 +45,7 @@ const SpyCreateYourOwn = () => {
     const saveSetAndPlay = async () => {
         if (words.length === 0) return;
         try {
-            const fs = require('expo-file-system');
-            const files = await fs.readDirectoryAsync(fs.documentDirectory);
-            console.log(files);
-
-            const path = fs.documentDirectory + 'player_set.json';
-            await fs.writeAsStringAsync(path, JSON.stringify({ words }), { encoding: fs.EncodingType.UTF8 });
+            saveSetWithName();
             router.push({ pathname: '/spy', params: { wordsCustom: words } });
         } catch (e) {
             alert('Failed to save set.');
@@ -80,13 +76,18 @@ const SpyCreateYourOwn = () => {
 	};
 
 	const saveSetWithName = async () => {
-		if (!saveName.trim() || words.length === 0) return;
 		setSaving(true);
 		try {
+			function ensureJsonExtension(string: string) {
+				return string.endsWith('.json') ? string : string + '.json';
+			}
 			const fs = require('expo-file-system');
-			const path = fs.documentDirectory + saveName.trim() + '.json';
+			const nameToSave = (saveName === "" || saveName.trim() === "" || saveName === null)
+				? (params.wordSet as string)
+				: saveName.trim();
+			const finalName = ensureJsonExtension(nameToSave);
+			const path = fs.documentDirectory + finalName;
 			await fs.writeAsStringAsync(path, JSON.stringify({ words }), { encoding: fs.EncodingType.UTF8 });
-			alert('Set saved as ' + saveName.trim());
 			setSaveName('');
 		} catch (e) {
 			alert('Failed to save set.');
@@ -96,7 +97,7 @@ const SpyCreateYourOwn = () => {
 
 		return (
 				<View style={styles.container}>
-					<TouchableOpacity style={styles.backIcon} onPress={() => router.push('/spy_game_select')}>
+					<TouchableOpacity style={styles.backIcon} onPress={() => router.push('/spy_my_sets')}>
 						<Ionicons name="arrow-back" size={28} color="#fff" />
 					</TouchableOpacity>
 					<Text style={styles.title}>Add Your Own Words!</Text>
@@ -165,13 +166,14 @@ const SpyCreateYourOwn = () => {
 								style={styles.saveInput}
 								value={saveName}
 								onChangeText={setSaveName}
-								placeholder="Enter set name"
+								placeholder={'Enter set name'}
 								placeholderTextColor={themeSpyColors.tapText}
+                                
 							/>
 							<TouchableOpacity
 								style={styles.saveButton}
 								onPress={saveSetWithName}
-								disabled={saving || !saveName.trim() || words.length === 0}
+								disabled={saving || words.length === 0}
 							>
 								<Text style={styles.saveButtonText}>Save</Text>
 							</TouchableOpacity>
@@ -318,3 +320,4 @@ const styles = StyleSheet.create({
 });
 
 export default SpyCreateYourOwn;
+

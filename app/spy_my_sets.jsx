@@ -1,13 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
-import themeSpyColors from '../constants/themeSpyColors';
+import { useEffect, useState } from 'react';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { useRouter } from 'expo-router';
+import themeSpyColors from '../constants/themeSpyColors';
+import { useLocalSearchParams , useRouter } from 'expo-router';
 
 const SpyMySets = () => {
   const [sets, setSets] = useState([]);
   const router = useRouter();
+  const params = useLocalSearchParams();
+
+  const deleteSet = async (filename) => {
+    try {
+      await FileSystem.deleteAsync(FileSystem.documentDirectory + filename);
+      setSets(sets.filter(set => set !== filename));
+    } catch (e) {
+      alert('Failed to delete set.');
+    }
+  };
 
   useEffect(() => {
     const loadSets = async () => {
@@ -20,20 +31,35 @@ const SpyMySets = () => {
 
   return (
     <View style={styles.container}>
+        <TouchableOpacity style={styles.backIcon} onPress={() => router.push('/spy_game_select')}>
+            <Ionicons name="arrow-back" size={28} color="#fff" />
+        </TouchableOpacity>
       <Text style={styles.title}>Your Saved Sets</Text>
+        <View style={styles.setRow}>
       <TouchableOpacity
                     style={[styles.setButton, { backgroundColor: themeSpyColors.createYourOwnSetButton }, styles.createButton]}
-                    onPress={() => { router.push('/spy_create_your_own'); }}
+                    onPress={() => { router.push({ pathname: '/spy_create_your_own', params: { wordSet: "" } }); }}
                 >
                     <Text style={styles.setText}>Create New!</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.trashButton}>
+              <Ionicons name="trash" size={RFValue(24)} color=  "black" />
+              </TouchableOpacity>
+            </View>
+
       <FlatList
         data={sets}
         keyExtractor={item => item}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.setButton}>
-            <Text style={styles.setText}>{item.replace('.json', '')}</Text>
-          </TouchableOpacity>
+          <View style={styles.setRow}>
+            <TouchableOpacity style={styles.setButton}
+            onPress={() => { router.push({ pathname: '/spy_create_your_own', params: { wordSet: item } }); }}>
+              <Text style={styles.setText}>{item.replace('.json', '')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => deleteSet(item)} style={styles.trashButton}>
+              <Ionicons name="trash" size={RFValue(24)} color={themeSpyColors.spyText} />
+            </TouchableOpacity>
+          </View>
         )}
         ListEmptyComponent={<Text style={styles.emptyText}>No saved sets found.</Text>}
       />
@@ -42,6 +68,12 @@ const SpyMySets = () => {
 };
 
 const styles = StyleSheet.create({
+    backIcon: {
+		position: 'absolute',
+		top: RFValue(40),
+		left: RFValue(20),
+		zIndex: 10,
+	},
   container: {
     flex: 1,
     backgroundColor: themeSpyColors.background,
@@ -74,6 +106,14 @@ const styles = StyleSheet.create({
     fontSize: RFValue(16),
     marginTop: RFValue(32),
     textAlign: 'center',
+  },
+  setRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: RFValue(12),
+  },
+  trashButton: {
+    marginLeft: RFValue(8),
   },
 });
 

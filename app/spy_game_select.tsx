@@ -15,7 +15,6 @@ const SpyGameSelect = () => {
         { title: 'Football Players  🌍', file: 'football_players_world' },
         { title: 'Football Players  🇹🇷', file: 'football_players_tr' },
         { title: 'Films  🎬', file: 'films_world' },
-    
 	];
 	const [selectedSet, setSelectedSet] = useState<string | null>(null);
 
