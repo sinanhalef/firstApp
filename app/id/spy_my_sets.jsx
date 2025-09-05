@@ -13,7 +13,7 @@ const SpyMySets = () => {
 
   const deleteSet = async (filename) => {
     try {
-      await FileSystem.deleteAsync(FileSystem.documentDirectory + "spy/"+ filename);
+      await FileSystem.deleteAsync(FileSystem.documentDirectory + "id/"+ filename);
       setSets(sets.filter(set => set !== filename));
     } catch (e) {
       alert('Failed to delete set.');
@@ -22,7 +22,7 @@ const SpyMySets = () => {
 
   useEffect(() => {
     const loadSets = async () => {
-      const files = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory + "spy/");
+      const files = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory + "id/");
       const jsonSets = files.filter(f => f.endsWith('.json'));
       setSets(jsonSets);
     };
@@ -31,14 +31,14 @@ const SpyMySets = () => {
 
   return (
     <View style={styles.container}>
-        <TouchableOpacity style={styles.backIcon} onPress={() => router.push('/spy/spy_game_select')}>
+        <TouchableOpacity style={styles.backIcon} onPress={() => router.push('/id/spy_game_select')}>
             <Ionicons name="arrow-back" size={28} color="#fff" />
         </TouchableOpacity>
       <Text style={styles.title}>Your Saved Sets</Text>
         <View style={styles.setRow}>
       <TouchableOpacity
                     style={[styles.setButton, { backgroundColor: themeSpyColors.createYourOwnSetButton }, styles.createButton]}
-                    onPress={() => { router.push({ pathname: '/spy/spy_create_your_own', params: { wordSet: "" } }); }}
+                    onPress={() => { router.push({ pathname: '/id/spy_create_your_own', params: { wordSet: "" } }); }}
                 >
                     <Text style={styles.setText}>Create New!</Text>
                 </TouchableOpacity>
@@ -53,7 +53,7 @@ const SpyMySets = () => {
         renderItem={({ item }) => (
           <View style={styles.setRow}>
             <TouchableOpacity style={styles.setButton}
-            onPress={() => { router.push({ pathname: '/spy/spy_create_your_own', params: { wordSet: item } }); }}>
+            onPress={() => { router.push({ pathname: '/id/spy_create_your_own', params: { wordSet: item } }); }}>
               <Text style={styles.setText}>{item.replace('.json', '')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => deleteSet(item)} style={styles.trashButton}>

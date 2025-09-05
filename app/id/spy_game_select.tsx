@@ -9,12 +9,8 @@ import themeSpyColors from '../../constants/themeSpyColors';
 const SpyGameSelect = () => {
 	const router = useRouter();
 	const wordSets = [
-		{ title: 'Places', file: 'places' },
-		{ title: 'Famous People  🇺🇸', file: 'famous_people_us' },
-        { title: 'Famous People  🇹🇷', file: 'famous_people_tr' },
-        { title: 'Football Players  🌍', file: 'football_players_world' },
-        { title: 'Football Players  🇹🇷', file: 'football_players_tr' },
-        { title: 'Films  🎬', file: 'films_world' },
+		{ title: 'Basic Set', file: 'basic_set' },
+		
 	];
 	const [selectedSet, setSelectedSet] = useState<string | null>(null);
 	
@@ -27,7 +23,7 @@ const SpyGameSelect = () => {
 			<Text style={styles.title}>Select a Game Set</Text>
 			<TouchableOpacity
 				style={[styles.setButton, styles.createButton]}
-				onPress={() => { router.push('/spy/spy_my_sets'); }}
+				onPress={() => { router.push('/id/spy_my_sets'); }}
 			>
 				<Text style={styles.createButtonText}>My Own Sets</Text>
 			</TouchableOpacity>
@@ -51,7 +47,7 @@ const SpyGameSelect = () => {
 				<>
 					<TouchableOpacity
 						style={[styles.setButton, styles.playButton]}
-						onPress={() => router.push({ pathname: '/spy/spy', params: { wordSet: selectedSet } })}
+						onPress={() => router.push({ pathname: '/id/spy', params: { wordSet: selectedSet } })}
 					>
 						<Text style={styles.setText}>Play</Text>
 					</TouchableOpacity>
