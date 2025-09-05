@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import themeSpyColors from '../constants/themeSpyColors';
+import themeSpyColors from '../../constants/themeSpyColors';
 
 const SpyGame = () => {
   const router = useRouter();
@@ -23,12 +23,12 @@ const SpyGame = () => {
   const [wordIndex, setWordIndex] = useState(0);
 
   const sets: Record<string, () => Promise<{ default: { words: string[] }; words: string[] }>> = {
-    places: () => import("../wordSets/places.json"),
-    famous_people_us: () => import("../wordSets/famous_people_us.json"),
-    famous_people_tr: () => import("../wordSets/famous_people_tr.json"),
-    football_players_tr: () => import("../wordSets/football_players_tr.json"),
-    football_players_world: () => import("../wordSets/football_players_world.json"),
-    films_world: () => import("../wordSets/films_world.json"),
+    places: () => import("../../wordSets/places.json"),
+    famous_people_us: () => import("../../wordSets/famous_people_us.json"),
+    famous_people_tr: () => import("../../wordSets/famous_people_tr.json"),
+    football_players_tr: () => import("../../wordSets/football_players_tr.json"),
+    football_players_world: () => import("../../wordSets/football_players_world.json"),
+    films_world: () => import("../../wordSets/films_world.json"),
   };
 
 
@@ -108,7 +108,7 @@ const SpyGame = () => {
   
   return (
     <View style={styles.container}>
-        <TouchableOpacity style={styles.backIcon} onPress={() => started ? router.push('/spy') : router.push('/spy_game_select')}>
+        <TouchableOpacity style={styles.backIcon} onPress={() => started ? router.push('/spy/spy') : router.push('/spy/spy_game_select')}>
           <Icon name="arrow-back" size={28} color="#fff" />
         </TouchableOpacity>
       {!started ? (

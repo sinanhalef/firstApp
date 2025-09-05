@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import themeSpyColors from '../constants/themeSpyColors';
+import themeSpyColors from '../../constants/themeSpyColors';
 
 
 const SpyGameSelect = () => {
@@ -26,7 +26,7 @@ const SpyGameSelect = () => {
 			<Text style={styles.title}>Select a Game Set</Text>
 			<TouchableOpacity
 				style={[styles.setButton, styles.createButton]}
-				onPress={() => { router.push('/spy_my_sets'); }}
+				onPress={() => { router.push('/spy/spy_my_sets'); }}
 			>
 				<Text style={styles.createButtonText}>My Own Sets</Text>
 			</TouchableOpacity>
@@ -50,7 +50,7 @@ const SpyGameSelect = () => {
 				<>
 					<TouchableOpacity
 						style={[styles.setButton, styles.playButton]}
-						onPress={() => router.push({ pathname: '/spy', params: { wordSet: selectedSet } })}
+						onPress={() => router.push({ pathname: '/spy/spy', params: { wordSet: selectedSet } })}
 					>
 						<Text style={styles.setText}>Play</Text>
 					</TouchableOpacity>

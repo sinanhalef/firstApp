@@ -5,7 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import themeSpyColors from '../constants/themeSpyColors';
+import themeSpyColors from '../../constants/themeSpyColors';
 
 const SpyCreateYourOwn = () => {
     const router = useRouter();
@@ -46,7 +46,7 @@ const SpyCreateYourOwn = () => {
         if (words.length === 0) return;
         try {
             saveSetWithName();
-            router.push({ pathname: '/spy', params: { wordsCustom: words } });
+            router.push({ pathname: '/spy/spy', params: { wordsCustom: words } });
         } catch (e) {
             alert('Failed to save set.');
         }
@@ -97,7 +97,7 @@ const SpyCreateYourOwn = () => {
 
 		return (
 				<View style={styles.container}>
-					<TouchableOpacity style={styles.backIcon} onPress={() => router.push('/spy_my_sets')}>
+					<TouchableOpacity style={styles.backIcon} onPress={() => router.push('/spy/spy_my_sets')}>
 						<Ionicons name="arrow-back" size={28} color="#fff" />
 					</TouchableOpacity>
 					<Text style={styles.title}>Add Your Own Words!</Text>
