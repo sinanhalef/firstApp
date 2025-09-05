@@ -4,7 +4,6 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import GameIcon from '../components/GameIcon';
 import { Href } from 'expo-router';
 
-
 export default function RootLayout() {
   return (
     <View style={styles.container}>

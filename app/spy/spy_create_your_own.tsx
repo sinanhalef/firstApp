@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
 		borderBottomRightRadius: RFValue(8),
 	},
 	scrollContainer: {
-		maxHeight: RFValue(400),
+		maxHeight: RFValue(330),
 		width: '100%',
 		marginBottom: RFValue(16),
 	},

@@ -5,15 +5,45 @@ import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native
 import { RFValue } from 'react-native-responsive-fontsize';
 import themeSpyColors from '../../constants/themeSpyColors';
 
-
 const SpyGameSelect = () => {
 	const router = useRouter();
 	const wordSets = [
 		{ title: 'Basic Set', file: 'basic_set' },
-		
+		{ title: 'Second Set', file: 'second_set' },
 	];
 	const [selectedSet, setSelectedSet] = useState<string | null>(null);
-	
+
+	const saveSetWithName = async () => {
+		try {
+			function ensureJsonExtension(string: string) {
+				return string.endsWith('.json') ? string : string + '.json';
+			}
+			const fs = require('expo-file-system');
+			const saveName = "My Basic Set";
+			const finalName = ensureJsonExtension(saveName);
+			const path = fs.documentDirectory + "id/" + finalName;
+			const words = await loadAndShuffleSetWords();
+			console.log("Saving words to:", words);
+			await fs.writeAsStringAsync(path, JSON.stringify({ words }), { encoding: fs.EncodingType.UTF8 });
+		} catch (e) {
+			alert('Failed to save set.');
+		}
+	};
+
+	const sets: Record<string, () => Promise<{ default: { words: string[] }; words: string[] }>> = {
+    basic_set: () => import("../../idGameSets/basic_set.json"),};
+
+	const loadAndShuffleSetWords = async () => {
+    let words: string[] = [];
+	console.log("Loading words for set:", selectedSet);
+    if (!selectedSet) {
+      const setLoader = sets["basic_set"];
+      if (!setLoader) return [];
+      const setData = await setLoader();
+      words = setData.words || setData.default?.words || [];
+    } 
+    return words;
+  };
 
 	return (
 		<View style={styles.container}>
@@ -33,13 +63,30 @@ const SpyGameSelect = () => {
 				renderItem={({ item }) => {
 					const isSelected = selectedSet === item.file;
 					return (
-						<TouchableOpacity
-							style={[styles.setButton, isSelected && styles.setButtonDisabled]}
-							onPress={() => setSelectedSet(item.file)}
-							disabled={isSelected}
-						>
-							<Text style={styles.setText}>{item.title}</Text>
-						</TouchableOpacity>
+						<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+							<TouchableOpacity
+								style={[styles.setButton, isSelected && styles.setButtonDisabled]}
+								onPress={() => setSelectedSet(item.file)}
+								disabled={isSelected}
+							>
+								<Text style={styles.setText}>{item.title}</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								style={{ marginLeft: RFValue(8) }}
+								onPress={async () => {
+									await saveSetWithName();
+									router.push({
+										pathname: '/id/spy_create_your_own',
+										params: {
+											//wordsCustom: JSON.stringify(words),
+											wordSet: 'My Basic Set.json',
+										},
+									});
+								}}
+							>
+								<Ionicons name="create" size={RFValue(24)} color={themeSpyColors.playButton} />
+							</TouchableOpacity>
+						</View>
 					);
 				}}
 			/>

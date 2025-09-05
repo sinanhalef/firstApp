@@ -18,11 +18,9 @@ const SpyCreateYourOwn = () => {
     const params = useLocalSearchParams();
 
 	React.useEffect(() => {
-		
-		//FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'spy_sets').catch(() => { });
 		const loadWords = async () => {
 			try {
-				const path = FileSystem.documentDirectory + "spy/" + params.wordSet;
+				const path = FileSystem.documentDirectory + "id/" + params.wordSet;
 				const exists = await FileSystem.getInfoAsync(path);
 				if (exists.exists) {
 					const fileContent = await FileSystem.readAsStringAsync(path);
@@ -48,7 +46,7 @@ const SpyCreateYourOwn = () => {
         if (words.length === 0) return;
         try {
             saveSetWithName();
-            router.push({ pathname: '/spy/spy', params: { wordsCustom: words } });
+            router.push({ pathname: '/id/spy', params: { wordsCustom: words } });
         } catch (e) {
             alert('Failed to save set.');
         }
@@ -88,7 +86,7 @@ const SpyCreateYourOwn = () => {
 				? (params.wordSet as string)
 				: saveName.trim();
 			const finalName = ensureJsonExtension(nameToSave);
-			const path = fs.documentDirectory + "spy/" + finalName;
+			const path = fs.documentDirectory + "id/" + finalName;
 			await fs.writeAsStringAsync(path, JSON.stringify({ words }), { encoding: fs.EncodingType.UTF8 });
 			setSaveName('');
 		} catch (e) {
@@ -99,7 +97,7 @@ const SpyCreateYourOwn = () => {
 
 		return (
 				<View style={styles.container}>
-					<TouchableOpacity style={styles.backIcon} onPress={() => router.push('/spy/spy_my_sets')}>
+					<TouchableOpacity style={styles.backIcon} onPress={() => router.push('/id/spy_my_sets')}>
 						<Ionicons name="arrow-back" size={28} color="#fff" />
 					</TouchableOpacity>
 					<Text style={styles.title}>Add Your Own Words!</Text>
@@ -202,7 +200,7 @@ const styles = StyleSheet.create({
 		borderBottomRightRadius: RFValue(8),
 	},
 	scrollContainer: {
-		maxHeight: RFValue(400),
+		maxHeight: RFValue(330),
 		width: '100%',
 		marginBottom: RFValue(16),
 	},
