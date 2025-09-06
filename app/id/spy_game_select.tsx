@@ -11,27 +11,34 @@ const SpyGameSelect = () => {
 		{ title: 'Basic Set', file: 'basic_set' },
 		{ title: 'Second Set', file: 'second_set' },
 	];
-	const [selectedSet, setSelectedSet] = useState<string | null>(null);
 
-	const saveSetWithName = async () => {
+	const sets: Record<string, () => Promise<{ default: { words: string[] }; words: string[] }>> = {
+    basic_set: () => import("../../idGameSets/basic_set.json"),
+	second_set: () => import("../../idGameSets/second_set.json"),
+
+};
+
+	const [selectedSet, setSelectedSet] = useState<string | null>(null);
+	//const [index, setIndex] = useState(1);
+
+	// playin sagına bir edit tuşu ekle, o da spy_create_your_own a gitsin, orada da düzenleme yapabilsin
+	const saveSetWithName = async (saveName: string) => {
 		try {
 			function ensureJsonExtension(string: string) {
 				return string.endsWith('.json') ? string : string + '.json';
 			}
 			const fs = require('expo-file-system');
-			const saveName = "My Basic Set";
 			const finalName = ensureJsonExtension(saveName);
 			const path = fs.documentDirectory + "id/" + finalName;
 			const words = await loadAndShuffleSetWords();
-			console.log("Saving words to:", words);
+			console.log("Saving words:", words);
 			await fs.writeAsStringAsync(path, JSON.stringify({ words }), { encoding: fs.EncodingType.UTF8 });
 		} catch (e) {
 			alert('Failed to save set.');
 		}
 	};
 
-	const sets: Record<string, () => Promise<{ default: { words: string[] }; words: string[] }>> = {
-    basic_set: () => import("../../idGameSets/basic_set.json"),};
+	
 
 	const loadAndShuffleSetWords = async () => {
     let words: string[] = [];
@@ -71,34 +78,39 @@ const SpyGameSelect = () => {
 							>
 								<Text style={styles.setText}>{item.title}</Text>
 							</TouchableOpacity>
-							<TouchableOpacity
-								style={{ marginLeft: RFValue(8) }}
+						</View>
+					);
+				}}
+			/>
+			{selectedSet && (
+				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+					<TouchableOpacity
+						style={[styles.playAndEditButton, styles.playButton]}
+						onPress={() => router.push({ pathname: '/id/spy', params: { wordSet: selectedSet } })}
+					>
+						<Text style={styles.setText}>Play</Text>
+					</TouchableOpacity>
+					<TouchableOpacity
+						style={[styles.playAndEditButton]}
 								onPress={async () => {
-									await saveSetWithName();
+									//await saveSetWithName(selectedSet);
+									const setLoader = sets[selectedSet];
+									if (!setLoader) return [];
+									const setData = await setLoader();
+									//const words = setData.words.split(',').map(w => w.trim()).filter(Boolean);
 									router.push({
 										pathname: '/id/spy_create_your_own',
 										params: {
-											//wordsCustom: JSON.stringify(words),
-											wordSet: 'My Basic Set.json',
+											wordsCustom: JSON.stringify(setData.words).replace("[", "").replace("]","").replaceAll("\"",""),
+											wordSet: "My " + selectedSet,
+											//TODO: add cleaning here
 										},
 									});
 								}}
 							>
 								<Ionicons name="create" size={RFValue(24)} color={themeSpyColors.playButton} />
 							</TouchableOpacity>
-						</View>
-					);
-				}}
-			/>
-			{selectedSet && (
-				<>
-					<TouchableOpacity
-						style={[styles.setButton, styles.playButton]}
-						onPress={() => router.push({ pathname: '/id/spy', params: { wordSet: selectedSet } })}
-					>
-						<Text style={styles.setText}>Play</Text>
-					</TouchableOpacity>
-				</>
+				</View>
 			)}
 		</View>
 	);
@@ -147,6 +159,17 @@ const styles = StyleSheet.create({
 		marginBottom: RFValue(12),
 		width: RFValue(200),
 		alignItems: 'center',
+	},
+	playAndEditButton: {
+		backgroundColor: themeSpyColors.button,
+		padding: RFValue(12),
+		borderRadius: RFValue(8),
+		marginBottom: RFValue(30),
+		marginRight: RFValue(10),
+		marginLeft: RFValue(10),
+		width: RFValue(100),
+		alignItems: 'center',
+		marginTop: RFValue(16),
 	},
 	setText: {
 		color: themeSpyColors.text,

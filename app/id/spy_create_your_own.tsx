@@ -20,8 +20,10 @@ const SpyCreateYourOwn = () => {
 	React.useEffect(() => {
 		const loadWords = async () => {
 			try {
-				const path = FileSystem.documentDirectory + "id/" + params.wordSet;
-				const exists = await FileSystem.getInfoAsync(path);
+				let path = FileSystem.documentDirectory + "id/" + params.wordSet;
+				let exists = await FileSystem.getInfoAsync(path);
+				console.log("hello");
+
 				if (exists.exists) {
 					const fileContent = await FileSystem.readAsStringAsync(path);
 					const json = JSON.parse(fileContent);
@@ -32,7 +34,16 @@ const SpyCreateYourOwn = () => {
 			} catch (e) {
 			}
 		};
+		if (params.wordSet) {
 		loadWords();
+	}
+	 if (params.wordsCustom) {
+		console.log(params.wordsCustom.length);
+		const words = params.wordsCustom.split(',').map(w => w.trim()).filter(Boolean);
+		if (Array.isArray(words)) {
+			setWords(words);
+		}
+	}
 	}, []);
 
 	const addWord = () => {
