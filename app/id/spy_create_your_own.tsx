@@ -36,8 +36,7 @@ const SpyCreateYourOwn = () => {
 		};
 		if (params.wordSet) {
 		loadWords();
-	}
-	 if (params.wordsCustom) {
+	}  if (params.wordsCustom && typeof params.wordsCustom ==='string') {
 		console.log(params.wordsCustom.length);
 		const words = params.wordsCustom.split(',').map(w => w.trim()).filter(Boolean);
 		if (Array.isArray(words)) {

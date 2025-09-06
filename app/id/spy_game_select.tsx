@@ -21,37 +21,6 @@ const SpyGameSelect = () => {
 	const [selectedSet, setSelectedSet] = useState<string | null>(null);
 	//const [index, setIndex] = useState(1);
 
-	// playin sagına bir edit tuşu ekle, o da spy_create_your_own a gitsin, orada da düzenleme yapabilsin
-	const saveSetWithName = async (saveName: string) => {
-		try {
-			function ensureJsonExtension(string: string) {
-				return string.endsWith('.json') ? string : string + '.json';
-			}
-			const fs = require('expo-file-system');
-			const finalName = ensureJsonExtension(saveName);
-			const path = fs.documentDirectory + "id/" + finalName;
-			const words = await loadAndShuffleSetWords();
-			console.log("Saving words:", words);
-			await fs.writeAsStringAsync(path, JSON.stringify({ words }), { encoding: fs.EncodingType.UTF8 });
-		} catch (e) {
-			alert('Failed to save set.');
-		}
-	};
-
-	
-
-	const loadAndShuffleSetWords = async () => {
-    let words: string[] = [];
-	console.log("Loading words for set:", selectedSet);
-    if (!selectedSet) {
-      const setLoader = sets["basic_set"];
-      if (!setLoader) return [];
-      const setData = await setLoader();
-      words = setData.words || setData.default?.words || [];
-    } 
-    return words;
-  };
-
 	return (
 		<View style={styles.container}>
 			<TouchableOpacity style={styles.backIcon} onPress={() => router.push('/my_games')}>

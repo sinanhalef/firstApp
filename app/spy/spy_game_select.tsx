@@ -16,6 +16,14 @@ const SpyGameSelect = () => {
         { title: 'Football Players  🇹🇷', file: 'football_players_tr' },
         { title: 'Films  🎬', file: 'films_world' },
 	];
+	const sets: Record<string, () => Promise<{ default: { words: string[] }; words: string[] }>> = {
+    places: () => import("../../wordSets/places.json"),
+    famous_people_us: () => import("../../wordSets/famous_people_us.json"),
+    famous_people_tr: () => import("../../wordSets/famous_people_tr.json"),
+    football_players_tr: () => import("../../wordSets/football_players_tr.json"),
+    football_players_world: () => import("../../wordSets/football_players_world.json"),
+    films_world: () => import("../../wordSets/films_world.json"),
+  };
 	const [selectedSet, setSelectedSet] = useState<string | null>(null);
 	
 
@@ -48,14 +56,33 @@ const SpyGameSelect = () => {
 				}}
 			/>
 			{selectedSet && (
-				<>
+				<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 					<TouchableOpacity
-						style={[styles.setButton, styles.playButton]}
+						style={[styles.playAndEditButton, styles.playButton]}
 						onPress={() => router.push({ pathname: '/spy/spy', params: { wordSet: selectedSet } })}
 					>
 						<Text style={styles.setText}>Play</Text>
 					</TouchableOpacity>
-				</>
+					<TouchableOpacity
+						style={[styles.playAndEditButton]}
+								onPress={async () => {
+									const setLoader = sets[selectedSet];
+									if (!setLoader) return [];
+									const setData = await setLoader();
+									//const words = setData.words.split(',').map(w => w.trim()).filter(Boolean);
+									router.push({
+										pathname: '/spy/spy_create_your_own',
+										params: {
+											wordsCustom: JSON.stringify(setData.words).replace("[", "").replace("]","").replaceAll("\"",""),
+											wordSet: "My " + selectedSet,
+											//TODO: add cleaning here
+										},
+									});
+								}}
+							>
+								<Ionicons name="create" size={RFValue(24)} color={themeSpyColors.playButton} />
+							</TouchableOpacity>
+				</View>
 			)}
 		</View>
 	);
@@ -114,6 +141,17 @@ const styles = StyleSheet.create({
 		color: themeSpyColors.selectedText,
 		fontSize: RFValue(16),
 		marginTop: RFValue(24),
+	},
+	playAndEditButton: {
+		backgroundColor: themeSpyColors.button,
+		padding: RFValue(12),
+		borderRadius: RFValue(8),
+		marginBottom: RFValue(30),
+		marginRight: RFValue(10),
+		marginLeft: RFValue(10),
+		width: RFValue(100),
+		alignItems: 'center',
+		marginTop: RFValue(16),
 	},
 });
 

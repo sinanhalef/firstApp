@@ -34,7 +34,15 @@ const SpyCreateYourOwn = () => {
 			} catch (e) {
 			}
 		};
+		if (params.wordSet) {
 		loadWords();
+	}  if (params.wordsCustom && typeof params.wordsCustom ==='string') {
+		console.log(params.wordsCustom.length);
+		const words = params.wordsCustom.split(',').map(w => w.trim()).filter(Boolean);
+		if (Array.isArray(words)) {
+			setWords(words);
+		}
+	}
 	}, []);
 
 	const addWord = () => {
