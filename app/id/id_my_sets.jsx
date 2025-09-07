@@ -6,7 +6,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import themeSpyColors from '../../constants/themeSpyColors';
 import { useLocalSearchParams , useRouter } from 'expo-router';
 
-const SpyMySets = () => {
+const IdMySets = () => {
   const [sets, setSets] = useState([]);
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -31,14 +31,14 @@ const SpyMySets = () => {
 
   return (
     <View style={styles.container}>
-        <TouchableOpacity style={styles.backIcon} onPress={() => router.push('/id/spy_game_select')}>
+        <TouchableOpacity style={styles.backIcon} onPress={() => router.push('/id/id_game_select')}>
             <Ionicons name="arrow-back" size={28} color="#fff" />
         </TouchableOpacity>
       <Text style={styles.title}>Your Saved Sets</Text>
         <View style={styles.setRow}>
       <TouchableOpacity
                     style={[styles.setButton, { backgroundColor: themeSpyColors.createYourOwnSetButton }, styles.createButton]}
-                    onPress={() => { router.push({ pathname: '/id/spy_create_your_own', params: { wordSet: "" } }); }}
+                    onPress={() => { router.push({ pathname: '/id/id_create_your_own', params: { wordSet: "" } }); }}
                 >
                     <Text style={styles.setText}>Create New!</Text>
                 </TouchableOpacity>
@@ -53,7 +53,7 @@ const SpyMySets = () => {
         renderItem={({ item }) => (
           <View style={styles.setRow}>
             <TouchableOpacity style={styles.setButton}
-            onPress={() => { router.push({ pathname: '/id/spy_create_your_own', params: { wordSet: item } }); }}>
+            onPress={() => { router.push({ pathname: '/id/id_create_your_own', params: { wordSet: item } }); }}>
               <Text style={styles.setText}>{item.replace('.json', '')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => deleteSet(item)} style={styles.trashButton}>
@@ -117,4 +117,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SpyMySets;
+export default IdMySets;
