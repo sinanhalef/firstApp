@@ -11,8 +11,7 @@ export default function RootLayout() {
       <View style={styles.iconsContainer}>
         <GameIcon gameName="Spy" iconName="🎮" gameRoute={"/spy/spy_game_select" as Href}/>
         <GameIcon gameName="ID" iconName="🕵️‍♂️" gameRoute={"/id/id_game_select" as Href}/>
-        <GameIcon iconName="🎯"/>
-      
+        <GameIcon gameName="Multiplayer Spy" iconName="🕵️‍♂️" gameRoute={"/spy_multiplayer/landing" as Href}/>
       </View>
     </View>
   );
