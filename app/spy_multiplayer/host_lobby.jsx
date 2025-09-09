@@ -5,6 +5,7 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { RFValue } from 'react-native-responsive-fontsize';
 import themeSpyColors from '../../constants/themeSpyColors';
 // Use the room helpers from the app-local spy_multiplayer folder (avoids wrong config imports)
+import { db, ref, remove } from './firebase';
 import { createRoom, signInAnon } from './room';
 
 const HostLobby = () => {
@@ -65,7 +66,19 @@ const HostLobby = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backIcon} onPress={() => router.push('/spy_multiplayer/landing')}>
+      <TouchableOpacity
+        style={styles.backIcon}
+        onPress={async () => {
+          try {
+            if (roomCode) {
+              await remove(ref(db, `rooms/${roomCode}`));
+            }
+          } catch (e) {
+            // proceed with navigation even if cleanup fails
+          }
+          router.push('/spy_multiplayer/landing');
+        }}
+      >
         <Ionicons name="arrow-back" size={28} color="#fff" />
       </TouchableOpacity>
       <Text style={styles.title}>Room Created!</Text>

@@ -128,7 +128,13 @@ const RoomWaiting = () => {
         const setData = await sets[setKey]();
         words = setData.words || setData.default?.words || [];
       }
+
+
       if (!words.length) {
+        if(!params.wordsCustom) {
+          Alert.alert('Error', 'To use a custom set, the host must own the set.');
+          return;
+        }
         if (params.wordsCustom && Array.isArray(params.wordsCustom) && params.wordsCustom.length) {
           words = params.wordsCustom;
         } else {
