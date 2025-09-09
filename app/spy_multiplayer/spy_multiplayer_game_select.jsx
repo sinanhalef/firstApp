@@ -30,7 +30,39 @@ const SpyMultiplayerGameSelect = () => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backIcon} onPress={() => router.push('/my_games')}>
+      <TouchableOpacity
+        style={styles.backIcon}
+        onPress={async () => {
+          if (!roomCode) {
+            router.push('/spy_multiplayer/landing');
+            return;
+          }
+          // Fetch room data
+          const { auth, db, ref, get, remove, update } = await import('./firebase');
+          const uid = auth.currentUser?.uid;
+          const roomSnap = await get(ref(db, `rooms/${roomCode}`));
+          const room = roomSnap.exists() ? roomSnap.val() : null;
+          if (!room || !uid) {
+            router.push('/spy_multiplayer/landing');
+            return;
+          }
+          const isHost = room.host === uid;
+          const players = Object.keys(room.players || {});
+          if (isHost) {
+            // Remove host from players list
+            await remove(ref(db, `rooms/${roomCode}/players/${uid}`));
+            const others = players.filter(id => id !== uid);
+            if (others.length > 0) {
+              // Transfer host to first other player
+              await update(ref(db, `rooms/${roomCode}`), { host: others[0] });
+            } else {
+              // Host is alone, delete room
+              await remove(ref(db, `rooms/${roomCode}`));
+            }
+          }
+            router.push('/spy_multiplayer/landing');
+        }}
+      >
         <Ionicons name="arrow-back" size={28} color="#fff" />
       </TouchableOpacity>
       <Text style={styles.title}>Select a Game Set</Text>

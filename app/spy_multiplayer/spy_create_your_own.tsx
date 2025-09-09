@@ -70,7 +70,7 @@ const SpyCreateYourOwn = () => {
 				public: { selectedSetKey: '', selectedSetTitle: wordSetTitle },
 				customWords: words,
 			});
-			router.push({ pathname: '/spy_multiplayer/room_waiting', params: { roomCode: params.roomCode } });
+			router.push({ pathname: '/spy_multiplayer/room_waiting', params: { roomCode: params.roomCode, wordsCustom: words, } });
 		} catch (e) {
 			alert('Failed to save set.');
 		}

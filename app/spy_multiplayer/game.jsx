@@ -6,7 +6,8 @@ import themeSpyColors from '../../constants/themeSpyColors';
 import { auth, db, onValue, ref, update } from './firebase';
 
 const SpyMultiplayerGame = () => {
-  const { roomCode } = useLocalSearchParams();
+  const params = useLocalSearchParams();
+  const roomCode = params.roomCode || '';
   const router = useRouter();
   const code = useMemo(() => String(roomCode || ''), [roomCode]);
   const uid = auth.currentUser?.uid;
@@ -58,7 +59,11 @@ const SpyMultiplayerGame = () => {
   const names = Array.isArray(game?.revealedSpies) ? game.revealedSpies : [];
   const list = names.length ? names.join(', ') : 'Spies';
   try { Alert.alert('Spies', list || ''); } catch {}
+  if (params.wordsCustom) {
+    router.replace({ pathname: '/spy_multiplayer/room_waiting', params: { roomCode: code, wordsCustom: params.wordsCustom } });
+  } else {
     router.replace({ pathname: '/spy_multiplayer/room_waiting', params: { roomCode: code } });
+  }
   }, [game?.finished]);
 
   if (!game?.started) {

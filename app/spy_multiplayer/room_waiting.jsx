@@ -8,7 +8,8 @@ import { auth, db, ref, remove, update } from './firebase';
 import { listenToRoom } from './room';
 
 const RoomWaiting = () => {
-  const { roomCode } = useLocalSearchParams();
+  const params = useLocalSearchParams();
+  const roomCode = params.roomCode || '';
   const router = useRouter();
   const code = useMemo(() => String(roomCode || ''), [roomCode]);
   const [room, setRoom] = useState(null);
@@ -45,7 +46,7 @@ const RoomWaiting = () => {
     if (!room || navigatedRef.current) return;
     if (room?.game?.started) {
       navigatedRef.current = true;
-      router.replace({ pathname: '/spy_multiplayer/game', params: { roomCode: code } });
+      router.replace({ pathname: '/spy_multiplayer/game', params: { roomCode: code, wordsCustom: params.wordsCustom } });
     }
   }, [room, code]);
 
@@ -117,6 +118,7 @@ const RoomWaiting = () => {
   };
 
   const startGame = async () => {
+
     if (!isHost) return;
     const setKey = room?.selectedSetKey || room?.wordSet || room?.public?.selectedSetKey;
     try {
@@ -126,6 +128,14 @@ const RoomWaiting = () => {
         const setData = await sets[setKey]();
         words = setData.words || setData.default?.words || [];
       }
+      if (!words.length) {
+        if (params.wordsCustom && Array.isArray(params.wordsCustom) && params.wordsCustom.length) {
+          words = params.wordsCustom;
+        } else {
+          words = params.wordsCustom.split(',').map(w => w.trim()).filter(Boolean);
+        }
+      }
+
       const randomWord = words.length
         ? words[Math.floor(Math.random() * words.length)]
         : (room?.wordSetTitle || 'Unknown');
