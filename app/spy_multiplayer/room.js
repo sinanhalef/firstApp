@@ -30,7 +30,7 @@ export async function signInAnon() {
 // Create a new room, returns room code
 export async function createRoom(userId) {
   // Generate a 6-digit numeric code and ensure no collision
-  const genCode = () => String(Math.floor(100000 + Math.random() * 900000));
+  const genCode = () => String(Math.floor(1000 + Math.random() * 9000)) + String(Math.floor(Math.random() * 2) === 0 ? 31 : 69);
   let attempts = 0;
   while (attempts < 5) {
     const roomCode = genCode();

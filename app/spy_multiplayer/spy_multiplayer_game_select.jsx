@@ -36,7 +36,7 @@ const SpyMultiplayerGameSelect = () => {
       <Text style={styles.title}>Select a Game Set</Text>
       <TouchableOpacity
         style={[styles.setButton, styles.createButton]}
-        onPress={() => { router.push('/spy/spy_my_sets'); }}
+        onPress={() => { router.push({ pathname: '/spy_multiplayer/spy_my_sets', params: { roomCode } }); }}
       >
         <Text style={styles.createButtonText}>My Own Sets</Text>
       </TouchableOpacity>
@@ -62,7 +62,6 @@ const SpyMultiplayerGameSelect = () => {
             style={[styles.playAndEditButton, styles.playButton]}
             onPress={async () => {
               if (!roomCode || !selectedSet) return;
-              // Persist selected set in the room (duplicate under selectedSet* for wider client compatibility)
               const chosen = wordSets.find(w => w.file === selectedSet);
               const wordSetTitle = chosen?.title || String(selectedSet);
               await update(ref(db, `rooms/${roomCode}`), {
@@ -71,7 +70,6 @@ const SpyMultiplayerGameSelect = () => {
                 selectedSetKey: String(selectedSet),
                 selectedSetTitle: wordSetTitle,
               });
-              // Also store under a public node for clients that only watch public
               await update(ref(db, `rooms/${roomCode}/public`), {
                 selectedSetKey: String(selectedSet),
                 selectedSetTitle: wordSetTitle,
@@ -88,10 +86,11 @@ const SpyMultiplayerGameSelect = () => {
               if (!setLoader) return [];
               const setData = await setLoader();
               router.push({
-                pathname: '/spy/spy_create_your_own',
+                pathname: '/spy_multiplayer/spy_create_your_own',
                 params: {
                   wordsCustom: JSON.stringify(setData.words).replace('[', '').replace(']', '').replaceAll('"', ''),
                   wordSet: 'My ' + selectedSet,
+                  roomCode,
                 },
               });
             }}

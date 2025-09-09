@@ -15,6 +15,7 @@ const RoomWaiting = () => {
   const [spiesCount, setSpiesCount] = useState(1);
   const uid = auth.currentUser?.uid;
   const navigatedRef = useRef(false);
+  const leavingRef = useRef(false);
 
   useEffect(() => {
     if (!code) return;
@@ -30,10 +31,12 @@ const RoomWaiting = () => {
     const isHostUser = room?.host === uid;
     const inPlayers = !!room?.players?.[uid];
     if (!isHostUser && !inPlayers) {
-      try {
-        Alert.alert('Removed from room', 'You were removed by the host.', [{ text: 'OK' }]);
-      } catch {}
-      router.replace('/spy_multiplayer/landing');
+      if (!leavingRef.current) {
+        try {
+          Alert.alert('Removed from room', 'You have been removed from the room.', [{ text: 'OK' }]);
+        } catch {}
+        router.replace('/spy_multiplayer/landing');
+      }
     }
   }, [room, uid]);
 
@@ -58,7 +61,7 @@ const RoomWaiting = () => {
       return;
     }
     const isHostUser = room?.host === currentUid;
-    if (isHostUser) {
+  if (isHostUser) {
       const count = Object.keys(room?.players || {}).length;
       if (count > 1) {
         Alert.alert(
@@ -77,6 +80,8 @@ const RoomWaiting = () => {
       router.push('/spy_multiplayer/landing');
       return;
     }
+  // Non-host: mark leaving to avoid duplicate alerts/navigation from listeners
+  leavingRef.current = true;
     try {
       await remove(ref(db, `rooms/${code}/players/${currentUid}`));
     } catch (e) {
@@ -243,6 +248,13 @@ const RoomWaiting = () => {
         </TouchableOpacity>
       </View>
       )}
+      {!isHost && (
+        <View style={styles.bottomBar}>
+          <TouchableOpacity style={styles.leaveButton} onPress={onBack}>
+            <Text style={styles.leaveButtonText}>Leave Room</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -370,6 +382,18 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   playButtonText: {
+    color: themeSpyColors.text,
+    fontWeight: 'bold',
+    fontSize: RFValue(16),
+  },
+  leaveButton: {
+    width: '100%',
+    backgroundColor: themeSpyColors.button,
+    borderRadius: RFValue(10),
+    paddingVertical: RFValue(12),
+    alignItems: 'center',
+  },
+  leaveButtonText: {
     color: themeSpyColors.text,
     fontWeight: 'bold',
     fontSize: RFValue(16),
